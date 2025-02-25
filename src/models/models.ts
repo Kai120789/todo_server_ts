@@ -1,11 +1,28 @@
 import sequelize from '../db'
-import DataTypes from 'sequelize'
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize'
 
-const Users = sequelize.define('users', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    login: {type: DataTypes.STRING, unique: true},
-    password: {type: DataTypes.STRING}
-})
+interface UserAttributes {
+  id: number;
+  login: string;
+  password: string;
+}
+
+interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+
+class Users extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  public id!: number;
+  public login!: string;
+  public password!: string;
+}
+
+Users.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    login: { type: DataTypes.STRING, unique: true },
+    password: { type: DataTypes.STRING }
+  },
+  { sequelize, tableName: 'users' }
+);
 
 const Boards = sequelize.define('boards', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},

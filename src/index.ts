@@ -1,13 +1,16 @@
+require('dotenv').config()
 import express, { NextFunction, Request, Response } from "express"
 import router from "./routes"
-require('dotenv').config()
 import sequelize from './db'
 import models from './models/models'
+import errorHandler from './middleware/errorHandlingMiddleware'
 
 const app = express()
 
 app.use(express.json())
 app.use('/api', router)
+
+app.use(errorHandler)
 
 const PORT = 3000
 const start = async() => {
