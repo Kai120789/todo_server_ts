@@ -12,37 +12,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const models_1 = require("../models/models");
+const models_1 = __importDefault(require("../models/models"));
 const ApiErrors_1 = __importDefault(require("../errors/ApiErrors"));
 class StatusController {
     create(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const { status } = req.body;
             try {
-                const newStatus = yield models_1.Status.create({ status });
+                const newStatus = yield models_1.default.Statuses.create({ status });
                 res.json(newStatus);
             }
             catch (error) {
-                next(ApiErrors_1.default.internal('failed to create new status'));
+                return next(ApiErrors_1.default.internal('failed to create new status'));
             }
         });
     }
     getAll(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const statuses = yield models_1.Status.findAll();
-            res.json(statuses);
+            try {
+                const statuses = yield models_1.default.Statuses.findAll();
+                res.json(statuses);
+            }
+            catch (error) {
+                return next(ApiErrors_1.default.badRequest('failed to found statuses'));
+            }
         });
     }
     delete(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const status = yield models_1.Status.findOne({ where: { id } });
-            if (!status) {
-                next(ApiErrors_1.default.badRequest('status not found'));
+            try {
+                const { id } = req.params;
+                const status = yield models_1.default.Statuses.findOne({ where: { id } });
+                if (!status) {
+                    return next(ApiErrors_1.default.badRequest('status not found'));
+                }
+                yield models_1.default.Statuses.destroy({ where: { id } });
+                res.json({ message: 'status deleted successfuly' });
             }
-            yield models_1.Status.destroy({ where: { id } });
-            res.json({ message: 'status deleted successfuly' });
+            catch (error) {
+                return next(ApiErrors_1.default.badRequest('failed to delete statuses'));
+            }
         });
     }
 }
-exports.default = new StatusController();
+const statusController = new StatusController();
+exports.default = statusController;

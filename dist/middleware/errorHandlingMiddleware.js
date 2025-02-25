@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const ApiErrors_1 = __importDefault(require("../errors/ApiErrors"));
-module.exports = function (err, req, res, next) {
-    if (err instanceof ApiErrors_1.default) {
-        return res.status(err.status).json({ message: err.message });
+function handler(err, req, res, next) {
+    if (res.headersSent) {
+        return next(err); // Skip the response if headers are already sent
     }
-    return res.status(500).json({ message: "error" });
-};
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
+}
+exports.default = handler;

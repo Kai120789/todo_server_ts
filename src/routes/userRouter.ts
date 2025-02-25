@@ -9,4 +9,3 @@ router.get('/', JWTCheck, userController.check)
 router.delete('/logout', JWTCheck, userController.logout)
 
 export default router
-

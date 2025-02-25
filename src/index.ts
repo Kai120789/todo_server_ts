@@ -4,8 +4,13 @@ import router from "./routes"
 import sequelize from './db'
 import models from './models/models'
 import errorHandler from './middleware/errorHandlingMiddleware'
+import cors from 'cors'
 
 const app = express()
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
 app.use(express.json())
 app.use('/api', router)

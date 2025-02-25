@@ -12,57 +12,78 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const models_1 = require("../models/models");
+const models_1 = __importDefault(require("../models/models"));
 const ApiErrors_1 = __importDefault(require("../errors/ApiErrors"));
 class TaskController {
     create(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { title, description, userId, boardId } = req.body;
             try {
-                const task = yield models_1.Task.create({ title, description, userId, boardId, statusId: 1 });
+                const { title, description, userId, boardId } = req.body;
+                const task = yield models_1.default.Tasks.create({ title, description, userId, boardId, statusId: 1 });
                 res.json(task);
             }
             catch (error) {
-                next(ApiErrors_1.default.internal('failed to create new task'));
+                return next(ApiErrors_1.default.internal('failed to create new task'));
             }
         });
     }
     updateTask(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { title, description, userId, boardId, statusId } = req.body;
-            const { id } = req.params;
-            const task = yield models_1.Task.findOne({ where: { id } });
-            if (!task) {
-                next(ApiErrors_1.default.internal('task not found'));
+            try {
+                const { title, description, userId, boardId, statusId } = req.body;
+                const { id } = req.params;
+                const task = yield models_1.default.Tasks.findOne({ where: { id } });
+                if (!task) {
+                    return next(ApiErrors_1.default.badRequest('task not found'));
+                }
+                yield models_1.default.Tasks.update({ title, description, userId, boardId, statusId }, { where: { id } });
+                const updTask = yield models_1.default.Tasks.findOne({ where: { id } });
+                res.json(updTask);
             }
-            yield models_1.Task.update({ title, description, userId, boardId, statusId }, { where: { id } });
-            const updTask = yield models_1.Task.findOne({ where: { id } });
-            res.json(updTask);
+            catch (error) {
+                return next(ApiErrors_1.default.badRequest('task update error'));
+            }
         });
     }
-    getAll(req, res) {
+    getAll(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tasks = yield models_1.Task.findAll();
-            res.json(tasks);
+            try {
+                const tasks = yield models_1.default.Tasks.findAll();
+                res.json(tasks);
+            }
+            catch (error) {
+                return next(ApiErrors_1.default.badRequest('get tasks error'));
+            }
         });
     }
-    getOne(req, res) {
+    getOne(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const task = yield models_1.Task.findOne({ where: { id } });
-            res.json(task);
+            try {
+                const { id } = req.params;
+                const task = yield models_1.default.Tasks.findOne({ where: { id } });
+                res.json(task);
+            }
+            catch (error) {
+                return next(ApiErrors_1.default.badRequest('get task error'));
+            }
         });
     }
     delete(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const task = yield models_1.Task.findOne({ where: { id } });
-            if (!task) {
-                next(ApiErrors_1.default.internal('task not found'));
+            try {
+                const { id } = req.params;
+                const task = yield models_1.default.Tasks.findOne({ where: { id } });
+                if (!task) {
+                    return next(ApiErrors_1.default.badRequest('task not found'));
+                }
+                yield models_1.default.Tasks.destroy({ where: { id } });
+                res.json({ message: 'task deleted successfuly' });
             }
-            yield models_1.Task.destroy({ where: { id } });
-            res.json({ message: 'task deleted successfuly' });
+            catch (error) {
+                return next(ApiErrors_1.default.badRequest('task delete error'));
+            }
         });
     }
 }
-exports.default = new TaskController();
+const taskController = new TaskController();
+exports.default = taskController;

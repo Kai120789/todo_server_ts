@@ -13,27 +13,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../db"));
-const sequelize_1 = __importDefault(require("sequelize"));
-const Users = db_1.default.define('users', {
-    id: { type: sequelize_1.default.INTEGER, primaryKey: true, autoIncrement: true },
-    login: { type: sequelize_1.default.STRING, unique: true },
-    password: { type: sequelize_1.default.STRING }
-});
+const sequelize_1 = require("sequelize");
+class Users extends sequelize_1.Model {
+}
+Users.init({
+    id: { type: sequelize_1.DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    login: { type: sequelize_1.DataTypes.STRING, unique: true },
+    password: { type: sequelize_1.DataTypes.STRING }
+}, { sequelize: db_1.default, tableName: 'users' });
 const Boards = db_1.default.define('boards', {
-    id: { type: sequelize_1.default.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: sequelize_1.default.STRING, allowNull: false }
+    id: { type: sequelize_1.DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: sequelize_1.DataTypes.STRING, allowNull: false }
 });
 const Statuses = db_1.default.define('statuses', {
-    id: { type: sequelize_1.default.INTEGER, primaryKey: true, autoIncrement: true },
-    status: { type: sequelize_1.default.STRING, allowNull: false }
+    id: { type: sequelize_1.DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    status: { type: sequelize_1.DataTypes.STRING, allowNull: false }
 });
 const Tasks = db_1.default.define('tasks', {
-    id: { type: sequelize_1.default.INTEGER, primaryKey: true, autoIncrement: true },
-    title: { type: sequelize_1.default.STRING, allowNull: false },
-    description: { type: sequelize_1.default.STRING, allowNull: false },
+    id: { type: sequelize_1.DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    title: { type: sequelize_1.DataTypes.STRING, allowNull: false },
+    description: { type: sequelize_1.DataTypes.STRING, allowNull: false },
 });
 const BoardsUsers = db_1.default.define('boards_users', {
-    id: { type: sequelize_1.default.INTEGER, primaryKey: true, autoIncrement: true }
+    id: { type: sequelize_1.DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        references: {
+            model: 'users', // таблица, на которую ссылается userId
+            key: 'id' // внешний ключ
+        }
+    },
+    boardId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        references: {
+            model: 'boards', // таблица, на которую ссылается boardId
+            key: 'id' // внешний ключ
+        }
+    }
 });
 Users.hasMany(Tasks);
 Tasks.belongsTo(Users);

@@ -2,11 +2,13 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from 'express'
 import ApiError from '../errors/ApiErrors'
 
 
-const handler: ErrorRequestHandler = function (err: ApiError, req: Request, res: Response, next: NextFunction) {
-    if (err instanceof ApiError) {
-        res.status(err.status).json({message: err.message})
+function handler(err: any, req: Request, res: Response, next: NextFunction) {
+    if (res.headersSent) {
+        return next(err); // Skip the response if headers are already sent
     }
-    res.status(500).json({message: "error"})
+
+    res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
 }
+
 
 export default handler

@@ -44,17 +44,18 @@ const BoardsUsers = sequelize.define('boards_users', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
 })
 
-Users.hasMany(Tasks)
-Tasks.belongsTo(Users)
+Users.hasMany(Tasks, { foreignKey: 'userId' });
+Tasks.belongsTo(Users, { foreignKey: 'userId' });
 
-Statuses.hasMany(Tasks)
-Tasks.belongsTo(Statuses)
+Statuses.hasMany(Tasks, { foreignKey: 'statusId' });
+Tasks.belongsTo(Statuses, { foreignKey: 'statusId' });
 
-Boards.hasMany(Tasks)
-Tasks.belongsTo(Boards)
+Boards.hasMany(Tasks, { foreignKey: 'boardId' });
+Tasks.belongsTo(Boards, { foreignKey: 'boardId' });
 
-Users.belongsToMany(Boards, {through: BoardsUsers})
-Boards.belongsToMany(Users, {through: BoardsUsers})
+Users.belongsToMany(Boards, { through: BoardsUsers, foreignKey: 'userId' });
+Boards.belongsToMany(Users, { through: BoardsUsers, foreignKey: 'boardId' });
+
 
 const initStatuses = async () => {
     try {
