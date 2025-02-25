@@ -12,7 +12,7 @@ app.use('/api', router)
 
 app.use(errorHandler)
 
-const PORT = 3000
+const PORT = Number(process.env.PORT) || 3000
 const start = async() => {
     try {
         await sequelize.authenticate()
