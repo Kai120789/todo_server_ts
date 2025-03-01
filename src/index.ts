@@ -1,4 +1,5 @@
-require('dotenv').config()
+import dotenv from 'dotenv'
+dotenv.config()
 import express, { NextFunction, Request, Response } from "express"
 import router from "./routes"
 import sequelize from './db'
